@@ -34,23 +34,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="irS-JS-r5D">
-                                <rect key="frame" x="32" y="137" width="531" height="28"/>
+                                <rect key="frame" x="48" y="137" width="515" height="28"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search" usesSingleLineMode="YES" id="HQ2-9h-L2Z">
                                     <font key="font" metaFont="systemLight" size="24"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bq4-We-5dm">
-                                <rect key="frame" x="8" y="128.5" width="18" height="42"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="18" id="ckx-b4-W8C"/>
-                                    <constraint firstAttribute="height" constant="32" id="fkU-JG-TU7"/>
-                                </constraints>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="jSH-et-ZBn">
-                                    <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="large"/>
-                                </imageCell>
-                            </imageView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="935-W7-cww">
                                 <rect key="frame" x="0.0" y="123" width="600" height="5"/>
                             </box>
@@ -168,22 +158,48 @@
                                     <action selector="clearBtnAction:" target="-2" id="Fli-Nh-mk1"/>
                                 </connections>
                             </button>
+                            <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Cwa-38-Pc7">
+                                <rect key="frame" x="3" y="140" width="39" height="19"/>
+                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" altersStateOfSelectedItem="NO" id="0Le-KP-EtU">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" autoenablesItems="NO" id="L2M-ZE-4PO">
+                                        <items>
+                                            <menuItem hidden="YES" id="8e8-Tj-hdh">
+                                                <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="large"/>
+                                            </menuItem>
+                                            <menuItem title="Search By" enabled="NO" id="0u8-Su-avJ"/>
+                                            <menuItem title="File Name" id="rkT-F2-uLy">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem title="Artist" id="u4H-Dg-SBy">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="UZc-AC-LTl"/>
+                                            <menuItem title="Recent" enabled="NO" id="FGx-Au-DeM">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                            </menuItem>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                            </popUpButton>
                         </subviews>
                         <constraints>
                             <constraint firstItem="rsh-a6-Fcr" firstAttribute="top" secondItem="935-W7-cww" secondAttribute="bottom" id="58u-H3-vLG"/>
                             <constraint firstAttribute="bottom" secondItem="rsh-a6-Fcr" secondAttribute="bottom" id="5BS-05-SHh"/>
                             <constraint firstItem="935-W7-cww" firstAttribute="top" secondItem="GAl-oE-YmZ" secondAttribute="bottom" constant="7" id="5JG-Ym-Z5b"/>
-                            <constraint firstItem="irS-JS-r5D" firstAttribute="leading" secondItem="Bq4-We-5dm" secondAttribute="trailing" constant="8" id="8ev-FH-yqU"/>
                             <constraint firstItem="GAl-oE-YmZ" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="Bhe-2V-pKp"/>
-                            <constraint firstItem="Bq4-We-5dm" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="Cqp-eE-YEo"/>
                             <constraint firstAttribute="trailing" secondItem="rsh-a6-Fcr" secondAttribute="trailing" id="HkD-v9-Idf"/>
+                            <constraint firstItem="Cwa-38-Pc7" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="14" id="Iel-5s-wd2"/>
                             <constraint firstAttribute="trailing" secondItem="935-W7-cww" secondAttribute="trailing" id="Qij-UQ-LsC"/>
-                            <constraint firstItem="Bq4-We-5dm" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" constant="8" id="UhI-nb-qeO"/>
+                            <constraint firstItem="Cwa-38-Pc7" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" constant="8" id="SXx-n9-dLJ"/>
                             <constraint firstItem="935-W7-cww" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" id="dz9-lR-Lbl"/>
                             <constraint firstAttribute="trailing" secondItem="GAl-oE-YmZ" secondAttribute="trailing" constant="16" id="hwW-iV-BMa"/>
                             <constraint firstItem="rsh-a6-Fcr" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" id="lIA-Et-W1U"/>
                             <constraint firstItem="irS-JS-r5D" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="qH0-2M-Iy4"/>
                             <constraint firstItem="GAl-oE-YmZ" firstAttribute="leading" secondItem="irS-JS-r5D" secondAttribute="trailing" constant="8" id="uWa-Jq-VQt"/>
+                            <constraint firstItem="irS-JS-r5D" firstAttribute="leading" secondItem="Cwa-38-Pc7" secondAttribute="trailing" constant="8" id="zWs-kG-eUk"/>
                         </constraints>
                     </visualEffectView>
                 </subviews>
