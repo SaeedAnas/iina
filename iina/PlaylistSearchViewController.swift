@@ -250,10 +250,12 @@ class PlaylistSearchViewController: NSWindowController {
     
     let selected = searchResultsTableView.selectedRow
     
-    let updated = selected + by
+    var updated = selected + by
     
-    if updated >= length || updated < 0 {
-      return
+    if updated >= length {
+      updated = 0
+    } else if updated < 0 {
+      updated = length - 1
     }
     
     let indexSet = NSIndexSet(index: updated)

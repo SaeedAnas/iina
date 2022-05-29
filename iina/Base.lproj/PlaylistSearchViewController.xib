@@ -33,62 +33,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="173"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView focusRingType="none" distribution="fillProportionally" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1fg-cP-uQn">
-                                <rect key="frame" x="8" y="133" width="576" height="32"/>
-                                <subviews>
-                                    <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bq4-We-5dm">
-                                        <rect key="frame" x="0.0" y="-4.5" width="18" height="42"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="18" id="ckx-b4-W8C"/>
-                                        </constraints>
-                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="jSH-et-ZBn">
-                                            <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="large"/>
-                                        </imageCell>
-                                    </imageView>
-                                    <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="irS-JS-r5D">
-                                        <rect key="frame" x="24" y="0.0" width="531" height="32"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search" usesSingleLineMode="YES" id="HQ2-9h-L2Z">
-                                            <font key="font" metaFont="systemLight" size="24"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GAl-oE-YmZ">
-                                        <rect key="frame" x="561" y="-3" width="15" height="38"/>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="xmark.circle.fill" catalog="system" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="6S1-A3-ScO">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="clearBtnAction:" target="-2" id="Fli-Nh-mk1"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
+                            <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="irS-JS-r5D">
+                                <rect key="frame" x="32" y="137" width="531" height="28"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search" usesSingleLineMode="YES" id="HQ2-9h-L2Z">
+                                    <font key="font" metaFont="systemLight" size="24"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bq4-We-5dm">
+                                <rect key="frame" x="8" y="128.5" width="18" height="42"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="32" id="0Qd-0S-WoF"/>
-                                    <constraint firstAttribute="height" constant="32" id="6bc-qg-olu"/>
-                                    <constraint firstItem="Bq4-We-5dm" firstAttribute="top" secondItem="1fg-cP-uQn" secondAttribute="top" id="D1Q-QF-ez8"/>
-                                    <constraint firstItem="irS-JS-r5D" firstAttribute="top" secondItem="GAl-oE-YmZ" secondAttribute="top" id="Fj3-y0-ySt"/>
-                                    <constraint firstAttribute="bottom" secondItem="Bq4-We-5dm" secondAttribute="bottom" id="OF0-nj-Nfg"/>
-                                    <constraint firstItem="GAl-oE-YmZ" firstAttribute="top" secondItem="1fg-cP-uQn" secondAttribute="top" id="S0c-NR-5DF"/>
-                                    <constraint firstItem="irS-JS-r5D" firstAttribute="bottom" secondItem="GAl-oE-YmZ" secondAttribute="bottom" id="YzM-bZ-1cG"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="28" id="fjG-HW-ECc"/>
-                                    <constraint firstItem="Bq4-We-5dm" firstAttribute="top" secondItem="1fg-cP-uQn" secondAttribute="top" id="rfE-Ly-VZp"/>
-                                    <constraint firstAttribute="bottom" secondItem="GAl-oE-YmZ" secondAttribute="bottom" id="ywz-3o-xfF"/>
+                                    <constraint firstAttribute="width" constant="18" id="ckx-b4-W8C"/>
+                                    <constraint firstAttribute="height" constant="32" id="fkU-JG-TU7"/>
                                 </constraints>
-                                <visibilityPriorities>
-                                    <integer value="1000"/>
-                                    <integer value="1000"/>
-                                    <integer value="1000"/>
-                                </visibilityPriorities>
-                                <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
-                                </customSpacing>
-                            </stackView>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="jSH-et-ZBn">
+                                    <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="large"/>
+                                </imageCell>
+                            </imageView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="935-W7-cww">
-                                <rect key="frame" x="0.0" y="123" width="600" height="6"/>
+                                <rect key="frame" x="0.0" y="123" width="600" height="5"/>
                             </box>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="32" horizontalPageScroll="10" verticalLineScroll="32" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rsh-a6-Fcr">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="125"/>
@@ -191,18 +155,35 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
+                            <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GAl-oE-YmZ">
+                                <rect key="frame" x="569" y="130" width="15" height="38"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="0tb-ql-wxO"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="xmark.circle.fill" catalog="system" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="6S1-A3-ScO">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="clearBtnAction:" target="-2" id="Fli-Nh-mk1"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="rsh-a6-Fcr" firstAttribute="top" secondItem="935-W7-cww" secondAttribute="bottom" id="58u-H3-vLG"/>
                             <constraint firstAttribute="bottom" secondItem="rsh-a6-Fcr" secondAttribute="bottom" id="5BS-05-SHh"/>
-                            <constraint firstItem="1fg-cP-uQn" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="5d4-Vt-gmU"/>
-                            <constraint firstAttribute="trailing" secondItem="1fg-cP-uQn" secondAttribute="trailing" constant="16" id="7Qi-Hj-9KV"/>
+                            <constraint firstItem="935-W7-cww" firstAttribute="top" secondItem="GAl-oE-YmZ" secondAttribute="bottom" constant="7" id="5JG-Ym-Z5b"/>
+                            <constraint firstItem="irS-JS-r5D" firstAttribute="leading" secondItem="Bq4-We-5dm" secondAttribute="trailing" constant="8" id="8ev-FH-yqU"/>
+                            <constraint firstItem="GAl-oE-YmZ" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="Bhe-2V-pKp"/>
+                            <constraint firstItem="Bq4-We-5dm" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="Cqp-eE-YEo"/>
                             <constraint firstAttribute="trailing" secondItem="rsh-a6-Fcr" secondAttribute="trailing" id="HkD-v9-Idf"/>
-                            <constraint firstItem="935-W7-cww" firstAttribute="top" secondItem="1fg-cP-uQn" secondAttribute="bottom" constant="6" id="M0h-dN-utV"/>
-                            <constraint firstItem="1fg-cP-uQn" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" constant="8" id="N9e-9p-6ni"/>
                             <constraint firstAttribute="trailing" secondItem="935-W7-cww" secondAttribute="trailing" id="Qij-UQ-LsC"/>
+                            <constraint firstItem="Bq4-We-5dm" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" constant="8" id="UhI-nb-qeO"/>
                             <constraint firstItem="935-W7-cww" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" id="dz9-lR-Lbl"/>
+                            <constraint firstAttribute="trailing" secondItem="GAl-oE-YmZ" secondAttribute="trailing" constant="16" id="hwW-iV-BMa"/>
                             <constraint firstItem="rsh-a6-Fcr" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" id="lIA-Et-W1U"/>
+                            <constraint firstItem="irS-JS-r5D" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="qH0-2M-Iy4"/>
+                            <constraint firstItem="GAl-oE-YmZ" firstAttribute="leading" secondItem="irS-JS-r5D" secondAttribute="trailing" constant="8" id="uWa-Jq-VQt"/>
                         </constraints>
                     </visualEffectView>
                 </subviews>
