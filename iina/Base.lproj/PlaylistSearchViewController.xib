@@ -176,14 +176,20 @@
                                                     <action selector="useFileName:" target="-2" id="svx-Ai-ts3"/>
                                                 </connections>
                                             </menuItem>
-                                            <menuItem title="Artist" tag="2" id="u4H-Dg-SBy">
+                                            <menuItem title="Title" tag="2" id="rNF-1q-Bpu">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <action selector="useTitle:" target="-2" id="do8-nV-q8l"/>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title="Artist" tag="3" id="u4H-Dg-SBy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                 <connections>
                                                     <action selector="useArtist:" target="-2" id="Cse-rj-kD7"/>
                                                 </connections>
                                             </menuItem>
                                             <menuItem isSeparatorItem="YES" id="UZc-AC-LTl"/>
-                                            <menuItem title="Recent" tag="3" enabled="NO" id="FGx-Au-DeM">
+                                            <menuItem title="Recent" tag="4" enabled="NO" id="FGx-Au-DeM">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>

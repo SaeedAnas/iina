@@ -20,8 +20,9 @@ fileprivate let TableCellFontSize = 13
 fileprivate let MinScore = 5 // Minimum matching score to be rendered on search results table
 
 fileprivate let MenuItemFileName = 1
-fileprivate let MenuItemArtist = 2
-fileprivate let MenuItemRecents = 3
+fileprivate let MenuItemTitle = 2
+fileprivate let MenuItemArtist = 3
+fileprivate let MenuItemRecents = 4
 fileprivate let MenuItemRecentSearch = 101
 
 
@@ -44,11 +45,7 @@ class PlaylistSearchViewController: NSWindowController {
   private var isOpen = false
   
   // MARK: Menu Preferences
-  enum SearchOption {
-    case filename, artist
-  }
-  
-  var searchOption: SearchOption = .filename
+  var searchOptions: [SearchOption] = [.filename]
   var searchHistory: [String] = []
   
   // MARK: Search Results
@@ -128,12 +125,24 @@ class PlaylistSearchViewController: NSWindowController {
   @IBOutlet weak var searchPopUp: NSPopUpButton!
   
   @IBAction func useFileName(_ sender: Any) {
-    searchOption = .filename
+    toggleOption(.filename)
   }
   
+  @IBAction func useTitle(_ sender: Any) {
+    toggleOption(.title)
+  }
   @IBAction func useArtist(_ sender: Any) {
-    Logger.log("helo")
-    searchOption = .artist
+    toggleOption(.artist)
+  }
+  
+  func toggleOption(_ option: SearchOption) {
+    if searchOptions.contains(option) {
+      searchOptions.removeAll {
+        item in item == option
+      }
+    } else {
+      searchOptions.append(option)
+    }
   }
   
   override func windowDidLoad() {
@@ -355,7 +364,8 @@ class PlaylistSearchViewController: NSWindowController {
     let playlist = player.info.playlist
     
     searchWorkItem = DispatchWorkItem {
-      let results = searchPlaylist(playlist: playlist, pattern: input)
+      //      let results = searchPlaylist(playlist: playlist, pattern: input)
+      let results = self.searchMetadata(playlist: playlist, pattern: input)
       
       if self.isInputEmpty {
         return
@@ -368,6 +378,78 @@ class PlaylistSearchViewController: NSWindowController {
     
     searchWorkQueue.async(execute: searchWorkItem!)
     
+  }
+  
+  struct Indexed {
+    let item: MPVPlaylistItem, metadata: (title: String?, album: String?, artist: String?)?
+  }
+  
+  func index(playlist: [MPVPlaylistItem]) -> [Indexed] {
+    var indexed: [Indexed] = []
+    
+    for item in playlist {
+      func getMetadata() -> (title: String?, album: String?, artist: String?)? {
+        if let metadata = player.info.getCachedMetadata(item.filename) {
+          return metadata
+        } else {
+          player.info.player.refreshCachedVideoInfo(forVideoPath: item.filename)
+          if let metadata = player.info.getCachedMetadata(item.filename) {
+            return metadata
+          } else {
+            return nil
+          }
+        }
+      }
+      indexed.append(Indexed(item: item, metadata: getMetadata()))
+    }
+    
+    return indexed
+
+  }
+  
+  func searchMetadata(playlist: [MPVPlaylistItem], pattern: String) -> [SearchItem] {
+    
+    if searchOptions.count == 1 && searchOptions.contains(.filename) {
+      return searchPlaylist(playlist: playlist, pattern: pattern)
+    }
+    
+    let indexed = index(playlist: playlist)
+    
+    var results: [SearchItem] = []
+    
+    for (index, item) in indexed.enumerated() {
+      var options: [(result: Result, option: SearchOption, text: String)] = []
+      for option in searchOptions {
+        switch option {
+        case .filename:
+          let text = item.item.filenameForDisplay
+          options.append((fuzzyMatch(text: text, pattern: pattern), .filename, text))
+        case .artist:
+          guard let text = item.metadata?.artist else { continue }
+          options.append((fuzzyMatch(text: text, pattern: pattern), .artist, text))
+        case .title:
+          guard let text = item.metadata?.title else { continue }
+          options.append((fuzzyMatch(text: text, pattern: pattern), .title, text))
+        }
+      }
+      
+      if options.count == 0 {
+        continue
+      }
+      
+      options.sort { item1, item2 in item1.result.score > item2.result.score }
+      let result = options[0].result
+      let option = options[0].option
+      let text = options[0].text
+      let searchItem = SearchItem(item: item.item, result: result, playlistIndex: index, option: option, text: text)
+      
+      results.append(searchItem)
+
+    }
+    
+    results.sort(by: >)
+    
+    return results
   }
   
 }
@@ -421,9 +503,11 @@ extension PlaylistSearchViewController: NSMenuDelegate, NSMenuItemValidation {
   func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
     switch menuItem.tag {
     case MenuItemFileName:
-      menuItem.state = searchOption == .filename ? .on : .off
+      menuItem.state = searchOptions.contains(.filename) ? .on : .off
     case MenuItemArtist:
-      menuItem.state = searchOption == .artist ? .on : .off
+      menuItem.state = searchOptions.contains(.artist) ? .on : .off
+    case MenuItemTitle:
+      menuItem.state = searchOptions.contains(.title) ? .on : .off
     default:
       break
     }
@@ -472,7 +556,30 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
     }
     
     let searchItem = searchResults[row]
-    let render = NSMutableAttributedString(string: searchItem.item.filenameForDisplay)
+    let render = NSMutableAttributedString(string: searchItem.text)
+    
+    if searchItem.option == .artist {
+      var durationLabel: String = ""
+      if let cached = self.player.info.getCachedVideoDurationAndProgress(searchItem.item.filename), let duration = cached.duration {
+        if duration > 0 {
+          durationLabel = VideoTime(duration).stringRepresentation
+        }
+      } else { return nil }
+      
+//         Add bold for matching letters
+        for index in searchItem.result.pos {
+          let range = NSMakeRange(index , 1)
+          render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
+        }
+      
+    return [
+      "name": searchItem.item.filenameForDisplay,
+      "artist": render,
+      "duration": durationLabel,
+      "image": NSWorkspace.shared.icon(forFile: searchItem.item.filename)
+    ]
+
+    }
     
     var artistLabel = "" , durationLabel = ""
     
@@ -510,7 +617,7 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
       
     }
     
-    // Add bold for matching letters
+    //     Add bold for matching letters
     for index in searchItem.result.pos {
       let range = NSMakeRange(index , 1)
       render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
@@ -547,11 +654,16 @@ class FixRowView: NSTableRowView {
 // MARK: Search Playlist
 
 // TODO: Move to another file
+enum SearchOption {
+  case filename, artist, title
+}
 
 struct SearchItem {
   let item: MPVPlaylistItem
   let result: Result
   let playlistIndex: Int
+  let option: SearchOption
+  let text: String
 }
 
 extension SearchItem: Comparable {
@@ -578,7 +690,7 @@ func searchPlaylist(playlist: [MPVPlaylistItem], pattern: String) -> [SearchItem
       continue
     }
     
-    let searchItem = SearchItem(item: item, result: result, playlistIndex: index)
+    let searchItem = SearchItem(item: item, result: result, playlistIndex: index, option: .filename, text: item.filenameForDisplay)
     
     results.append(searchItem)
   }
