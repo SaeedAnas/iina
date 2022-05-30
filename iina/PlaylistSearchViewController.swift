@@ -145,6 +145,7 @@ class PlaylistSearchViewController: NSWindowController {
     } else {
       searchOptions.append(option)
     }
+    search(input: inputField.stringValue)
   }
   
   override func windowDidLoad() {
@@ -597,6 +598,7 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
             break
           }
         }
+        Logger.log(url.pathExtension)
       }
     }
       
@@ -673,6 +675,32 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
             }
             break
           }
+        }
+        if url.pathExtension != "mp3" {
+          let imgGenerator = AVAssetImageGenerator(asset: asset)
+          imgGenerator.appliesPreferredTrackTransform = true
+          var time: Int64 = 10
+          for data in asset.commonMetadata {
+            if data.commonKey == .id3MetadataKeyLength {
+              let length = (data.value as! Int64)/1000
+              if length < 10 {
+                time = length
+              }
+              break
+            }
+          }
+          do {
+            let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(value: time, timescale: 1), actualTime: nil)
+            let image = NSImage(cgImage: cgImage, size: NSMakeSize(CGFloat(cgImage.width), CGFloat(cgImage.height)))
+            self.thumbnails[item.filename] = image
+            DispatchQueue.main.async {
+            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
+            }
+          }
+          catch let error {
+            Logger.log("*** Error generating thumbnail: \(error.localizedDescription)")
+          }
+          
         }
       }
     }
