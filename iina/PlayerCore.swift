@@ -1570,6 +1570,8 @@ class PlayerCore: NSObject {
     }
     if Preference.bool(for: .enableThumbnailPreview) {
       if let cacheName = info.mpvMd5, ThumbnailCache.fileIsCached(forName: cacheName, forVideo: info.currentURL) {
+        Logger.log(info.mpvMd5!)
+        Logger.log(info.currentURL!.absoluteString)
         Logger.log("Found thumbnail cache", subsystem: subsystem)
         thumbnailQueue.async {
           if let thumbnails = ThumbnailCache.read(forName: cacheName) {

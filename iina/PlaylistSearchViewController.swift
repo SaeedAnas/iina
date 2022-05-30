@@ -8,10 +8,11 @@
 
 import Foundation
 import Cocoa
+import AVFoundation
 
 fileprivate let WindowWidth = 600
 fileprivate let InputFieldHeight = 46
-fileprivate let TableCellHeight = 32
+fileprivate let TableCellHeight = 40
 fileprivate let MaxTableViewHeight = TableCellHeight * 10
 fileprivate let BottomMargin = 6
 
@@ -50,6 +51,7 @@ class PlaylistSearchViewController: NSWindowController {
   
   // MARK: Search Results
   var searchResults: [SearchItem] = []
+  var thumbnails: [String: NSImage] = [:]
   // Run the fuzzy matching in a different thread so we don't pause the inputField
   var searchWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistSearchTask", qos: .userInitiated)
   // Make the searching cancellable so we aren't searching for a pattern when the pattern has changed
@@ -259,6 +261,7 @@ class PlaylistSearchViewController: NSWindowController {
     hideClearBtn()
     clearSearchResults()
     focusInput()
+    thumbnails.removeAll()
   }
   
   func clearSearchResults() {
@@ -571,6 +574,31 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
 //          let range = NSMakeRange(index , 1)
 //          render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
 //        }
+    let item = searchItem.item
+    if let image = thumbnails[item.filename] {
+      return [
+        "name": searchItem.item.filenameForDisplay,
+        "artist": searchItem.text,
+        "duration": durationLabel,
+        "image": image
+      ]
+    } else {
+      searchWorkQueue.async {
+        let url = URL(fileURLWithPath: item.filename)
+        let asset = AVAsset(url: url) as AVAsset
+        for data in asset.commonMetadata {
+          if data.commonKey == .commonKeyArtwork {
+            let imageData = data.value as! Data
+            let image = NSImage(data: imageData)
+            self.thumbnails[item.filename] = image
+            DispatchQueue.main.async {
+            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
+            }
+            break
+          }
+        }
+      }
+    }
       
     return [
       "name": searchItem.item.filenameForDisplay,
@@ -623,6 +651,32 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
       render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
       render.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.textColor, range: range)
     }
+    
+    if let image = thumbnails[item.filename] {
+      return [
+        "name": render,
+        "artist": artistLabel,
+        "duration": durationLabel,
+        "image": image
+      ]
+    } else {
+      searchWorkQueue.async {
+        let url = URL(fileURLWithPath: item.filename)
+        let asset = AVAsset(url: url) as AVAsset
+        for data in asset.commonMetadata {
+          if data.commonKey == .commonKeyArtwork {
+            let imageData = data.value as! Data
+            let image = NSImage(data: imageData)
+            self.thumbnails[item.filename] = image
+            DispatchQueue.main.async {
+            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
+            }
+            break
+          }
+        }
+      }
+    }
+    
     
     return [
       "name": render,
