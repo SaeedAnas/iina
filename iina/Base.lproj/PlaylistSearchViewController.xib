@@ -161,7 +161,7 @@
                             </button>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Cwa-38-Pc7">
                                 <rect key="frame" x="3" y="140" width="39" height="19"/>
-                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" tag="200" imageScaling="proportionallyDown" inset="2" pullsDown="YES" id="0Le-KP-EtU">
+                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" tag="200" imageScaling="proportionallyDown" inset="2" pullsDown="YES" altersStateOfSelectedItem="NO" id="0Le-KP-EtU">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" id="L2M-ZE-4PO">
@@ -195,6 +195,7 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <color key="bezelColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             </popUpButton>
                         </subviews>

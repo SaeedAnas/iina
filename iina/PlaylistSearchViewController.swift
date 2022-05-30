@@ -567,14 +567,14 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
       } else { return nil }
       
 //         Add bold for matching letters
-        for index in searchItem.result.pos {
-          let range = NSMakeRange(index , 1)
-          render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
-        }
+//        for index in searchItem.result.pos {
+//          let range = NSMakeRange(index , 1)
+//          render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
+//        }
       
     return [
       "name": searchItem.item.filenameForDisplay,
-      "artist": render,
+      "artist": searchItem.text,
       "duration": durationLabel,
       "image": NSWorkspace.shared.icon(forFile: searchItem.item.filename)
     ]
