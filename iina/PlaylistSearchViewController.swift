@@ -46,12 +46,13 @@ class PlaylistSearchViewController: NSWindowController {
   private var isOpen = false
   
   // MARK: Menu Preferences
-  var searchOptions: [SearchOption] = [.filename]
+  var searchOptions: [SearchOption] = [.filename, .artist, .title]
   var searchHistory: [String] = []
   
   // MARK: Search Results
   var searchResults: [SearchItem] = []
   var thumbnails: [String: NSImage] = [:]
+  var thumbnailWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistThumbnailTask", qos: .userInitiated)
   // Run the fuzzy matching in a different thread so we don't pause the inputField
   var searchWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistSearchTask", qos: .userInitiated)
   // Make the searching cancellable so we aren't searching for a pattern when the pattern has changed
@@ -262,7 +263,6 @@ class PlaylistSearchViewController: NSWindowController {
     hideClearBtn()
     clearSearchResults()
     focusInput()
-    thumbnails.removeAll()
   }
   
   func clearSearchResults() {
@@ -384,31 +384,95 @@ class PlaylistSearchViewController: NSWindowController {
     
   }
   
-  struct Indexed {
-    let item: MPVPlaylistItem, metadata: (title: String?, album: String?, artist: String?)?
-  }
+  var metadataCache: [String : (title: String?, album: String?, artist: String?, duration: Double?)] = [:]
+  var metadataWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistMetadataTask", qos: .userInitiated)
+  let semaphore = DispatchSemaphore(value: 1)
   
-  func index(playlist: [MPVPlaylistItem]) -> [Indexed] {
-    var indexed: [Indexed] = []
-    
-    for item in playlist {
-      func getMetadata() -> (title: String?, album: String?, artist: String?)? {
-        if let metadata = player.info.getCachedMetadata(item.filename) {
-          return metadata
-        } else {
-          player.info.player.refreshCachedVideoInfo(forVideoPath: item.filename)
-          if let metadata = player.info.getCachedMetadata(item.filename) {
-            return metadata
-          } else {
-            return nil
+  func indexImage(file: String) {
+    let url = URL(fileURLWithPath: file)
+    let asset = AVAsset(url: url) as AVAsset
+    for data in asset.commonMetadata {
+      if data.commonKey == .commonKeyArtwork {
+        let imageData = data.value as! Data
+        let image = NSImage(data: imageData)
+        self.thumbnails[file] = image
+        return
+      }
+      if url.pathExtension != "mp3" {
+        let imgGenerator = AVAssetImageGenerator(asset: asset)
+        imgGenerator.appliesPreferredTrackTransform = true
+        var time: Int64 = 10
+        for data in asset.commonMetadata {
+          if data.commonKey == .id3MetadataKeyLength {
+            let length = (data.value as! Int64)/1000
+            if length < 10 {
+              time = length
+            }
+            break
           }
         }
+        do {
+          let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(value: time, timescale: 1), actualTime: nil)
+          let image = NSImage(cgImage: cgImage, size: NSMakeSize(CGFloat(cgImage.width), CGFloat(cgImage.height)))
+          self.thumbnails[file] = image
+          return
+        }
+        catch let error {
+          Logger.log("*** Error generating thumbnail: \(error.localizedDescription)")
+        }
       }
-      indexed.append(Indexed(item: item, metadata: getMetadata()))
+    }
+  }
+  
+  func getMetadata(file: String) -> (title: String?, album: String?, artist: String?, duration: Double?) {
+    let url = URL(fileURLWithPath: file)
+    let asset = AVAsset(url: url) as AVAsset
+    var metadata: (title: String?, album: String?, artist: String?, duration: Double?) = (nil, nil, nil, nil)
+    for data in asset.commonMetadata {
+      if data.commonKey == .commonKeyTitle {
+        metadata.title = data.value as? String
+      }
+      else if data.commonKey ==  .commonKeyArtist {
+        metadata.artist = data.value as? String
+      }
+      else if data.commonKey ==  .commonKeyAlbumName {
+        metadata.album = data.value as? String
+      }
+    }
+    metadata.duration = asset.duration.seconds
+    
+    return metadata
+    
+  }
+  
+  func indexFile(file: String) {
+        let metadata = getMetadata(file: file)
+        semaphore.wait()
+        metadataCache[file] = metadata
+        semaphore.signal()
+  }
+  
+  func indexPlaylist(playlist: [MPVPlaylistItem]) {
+    
+    if metadataCache.count == playlist.count {
+      return
     }
     
-    return indexed
-
+    let size = playlist.count / 10
+    let group = DispatchGroup()
+    for i in stride(from: 0, to: playlist.count, by: size) {
+      metadataWorkQueue.async {
+        group.enter()
+        let chunk = playlist[i..<min(i+size, playlist.count)]
+        for item in chunk {
+          if self.metadataCache[item.filename] == nil {
+            self.indexFile(file: item.filename)
+          }
+        }
+        group.leave()
+      }
+    }
+    group.wait()
   }
   
   func searchMetadata(playlist: [MPVPlaylistItem], pattern: String) -> [SearchItem] {
@@ -417,22 +481,23 @@ class PlaylistSearchViewController: NSWindowController {
       return searchPlaylist(playlist: playlist, pattern: pattern)
     }
     
-    let indexed = index(playlist: playlist)
+    indexPlaylist(playlist: playlist)
     
     var results: [SearchItem] = []
     
-    for (index, item) in indexed.enumerated() {
+    for (index, item) in playlist.enumerated() {
+      let metadata = metadataCache[item.filename]
       var options: [(result: Result, option: SearchOption, text: String)] = []
       for option in searchOptions {
         switch option {
         case .filename:
-          let text = item.item.filenameForDisplay
+          let text = item.filenameForDisplay
           options.append((fuzzyMatch(text: text, pattern: pattern), .filename, text))
         case .artist:
-          guard let text = item.metadata?.artist else { continue }
+          guard let text = metadata?.artist else { continue }
           options.append((fuzzyMatch(text: text, pattern: pattern), .artist, text))
         case .title:
-          guard let text = item.metadata?.title else { continue }
+          guard let text = metadata?.title else { continue }
           options.append((fuzzyMatch(text: text, pattern: pattern), .title, text))
         }
       }
@@ -445,10 +510,10 @@ class PlaylistSearchViewController: NSWindowController {
       let result = options[0].result
       let option = options[0].option
       let text = options[0].text
-      let searchItem = SearchItem(item: item.item, result: result, playlistIndex: index, option: option, text: text)
+      let searchItem = SearchItem(item: item, result: result, playlistIndex: index, option: option, text: text)
       
       results.append(searchItem)
-
+      
     }
     
     results.sort(by: >)
@@ -562,157 +627,62 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
     let searchItem = searchResults[row]
     let render = NSMutableAttributedString(string: searchItem.text)
     
-    if searchItem.option == .artist {
-      var durationLabel: String = ""
-      if let cached = self.player.info.getCachedVideoDurationAndProgress(searchItem.item.filename), let duration = cached.duration {
-        if duration > 0 {
-          durationLabel = VideoTime(duration).stringRepresentation
-        }
-      } else { return nil }
-      
-//         Add bold for matching letters
-//        for index in searchItem.result.pos {
-//          let range = NSMakeRange(index , 1)
-//          render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
-//        }
-    let item = searchItem.item
-    if let image = thumbnails[item.filename] {
-      return [
-        "name": searchItem.item.filenameForDisplay,
-        "artist": searchItem.text,
-        "duration": durationLabel,
-        "image": image
-      ]
-    } else {
-      searchWorkQueue.async {
-        let url = URL(fileURLWithPath: item.filename)
-        let asset = AVAsset(url: url) as AVAsset
-        for data in asset.commonMetadata {
-          if data.commonKey == .commonKeyArtwork {
-            let imageData = data.value as! Data
-            let image = NSImage(data: imageData)
-            self.thumbnails[item.filename] = image
-            DispatchQueue.main.async {
-            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
-            }
-            break
-          }
-        }
-        Logger.log(url.pathExtension)
-      }
-    }
-      
-    return [
-      "name": searchItem.item.filenameForDisplay,
-      "artist": searchItem.text,
-      "duration": durationLabel,
-      "image": NSWorkspace.shared.icon(forFile: searchItem.item.filename)
-    ]
-
-    }
-    
-    var artistLabel = "" , durationLabel = ""
-    
     let item = searchItem.item
     
-    func getCachedMetadata() -> (artist: String, title: String)? {
-      guard Preference.bool(for: .playlistShowMetadata) else { return nil }
-      if Preference.bool(for: .playlistShowMetadataInMusicMode) && !player.isInMiniPlayer {
-        return nil
+    let metadata = metadataCache[item.filename]
+    if metadata == nil {
+      DispatchQueue.main.async {
+        self.indexFile(file: item.filename)
+        self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
       }
-      guard let metadata = player.info.getCachedMetadata(item.filename) else { return nil }
-      guard let artist = metadata.artist, let title = metadata.title else { return nil }
-      return (artist, title)
     }
     
-    if let (artist, title) = getCachedMetadata() {
-      artistLabel = artist
+    var durationLabel: String = ""
+    if let duration = metadata?.duration {
+      durationLabel = VideoTime(duration).stringRepresentation
     }
-    if let cached = self.player.info.getCachedVideoDurationAndProgress(item.filename), let duration = cached.duration {
-      if duration > 0 {
-        durationLabel = VideoTime(duration).stringRepresentation
-      }
+    
+    var image = NSWorkspace.shared.icon(forFile: item.filename)
+    if let thumbnail = thumbnails[item.filename] {
+      image = thumbnail
     } else {
-      
-      searchWorkQueue.async {
-        
-        self.player.refreshCachedVideoInfo(forVideoPath: item.filename)
-        
-        if let cached = self.player.info.getCachedVideoDurationAndProgress(item.filename), let duration = cached.duration, duration > 0 {
+      thumbnailWorkQueue.async {
+        self.indexImage(file: item.filename)
+        if self.thumbnails[item.filename] != nil {
           DispatchQueue.main.async {
             self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
           }
         }
       }
+    }
+    
+    if searchItem.option == .artist {
       
-    }
-    
-    //     Add bold for matching letters
-    for index in searchItem.result.pos {
-      let range = NSMakeRange(index , 1)
-      render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
-      render.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.textColor, range: range)
-    }
-    
-    if let image = thumbnails[item.filename] {
+      return [
+        "name": item.filenameForDisplay,
+        "artist": searchItem.text,
+        "duration": durationLabel,
+        "image": image
+      ]
+      
+    } else {
+      let artistLabel = metadata?.artist ?? ""
+      
+      // Add bold for matching letters
+      for index in searchItem.result.pos {
+        let range = NSMakeRange(index , 1)
+        render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
+        render.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.textColor, range: range)
+      }
+      
       return [
         "name": render,
         "artist": artistLabel,
         "duration": durationLabel,
         "image": image
       ]
-    } else {
-      searchWorkQueue.async {
-        let url = URL(fileURLWithPath: item.filename)
-        let asset = AVAsset(url: url) as AVAsset
-        for data in asset.commonMetadata {
-          if data.commonKey == .commonKeyArtwork {
-            let imageData = data.value as! Data
-            let image = NSImage(data: imageData)
-            self.thumbnails[item.filename] = image
-            DispatchQueue.main.async {
-            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
-            }
-            break
-          }
-        }
-        if url.pathExtension != "mp3" {
-          let imgGenerator = AVAssetImageGenerator(asset: asset)
-          imgGenerator.appliesPreferredTrackTransform = true
-          var time: Int64 = 10
-          for data in asset.commonMetadata {
-            if data.commonKey == .id3MetadataKeyLength {
-              let length = (data.value as! Int64)/1000
-              if length < 10 {
-                time = length
-              }
-              break
-            }
-          }
-          do {
-            let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(value: time, timescale: 1), actualTime: nil)
-            let image = NSImage(cgImage: cgImage, size: NSMakeSize(CGFloat(cgImage.width), CGFloat(cgImage.height)))
-            self.thumbnails[item.filename] = image
-            DispatchQueue.main.async {
-            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
-            }
-          }
-          catch let error {
-            Logger.log("*** Error generating thumbnail: \(error.localizedDescription)")
-          }
-          
-        }
-      }
+      
     }
-    
-    
-    return [
-      "name": render,
-      "artist": artistLabel,
-      "duration": durationLabel,
-      "image": NSWorkspace.shared.icon(forFile: item.filename)
-    ]
-    
   }
   
   // Enables arrow keys to be used in tableview
