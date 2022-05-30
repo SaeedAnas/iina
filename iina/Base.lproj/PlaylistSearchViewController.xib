@@ -13,6 +13,7 @@
                 <outlet property="clearBtn" destination="GAl-oE-YmZ" id="NY9-oF-a7z"/>
                 <outlet property="inputBorderBottom" destination="935-W7-cww" id="ij2-VS-ZzN"/>
                 <outlet property="inputField" destination="irS-JS-r5D" id="qhR-lc-qYm"/>
+                <outlet property="searchPopUp" destination="Cwa-38-Pc7" id="zQB-T2-Ck7"/>
                 <outlet property="searchResultsTableView" destination="1hl-4W-Z2Q" id="UAT-1V-f4L"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="5YA-t9-Hc2"/>
             </connections>
@@ -160,29 +161,35 @@
                             </button>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Cwa-38-Pc7">
                                 <rect key="frame" x="3" y="140" width="39" height="19"/>
-                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" altersStateOfSelectedItem="NO" id="0Le-KP-EtU">
+                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" tag="200" imageScaling="proportionallyDown" inset="2" pullsDown="YES" id="0Le-KP-EtU">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
-                                    <menu key="menu" autoenablesItems="NO" id="L2M-ZE-4PO">
+                                    <menu key="menu" id="L2M-ZE-4PO">
                                         <items>
-                                            <menuItem hidden="YES" id="8e8-Tj-hdh">
+                                            <menuItem tag="200" hidden="YES" id="8e8-Tj-hdh">
                                                 <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="large"/>
                                             </menuItem>
                                             <menuItem title="Search By" enabled="NO" id="0u8-Su-avJ"/>
-                                            <menuItem title="File Name" id="rkT-F2-uLy">
+                                            <menuItem title="File Name" tag="1" id="rkT-F2-uLy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <action selector="useFileName:" target="-2" id="svx-Ai-ts3"/>
+                                                </connections>
                                             </menuItem>
-                                            <menuItem title="Artist" id="u4H-Dg-SBy">
+                                            <menuItem title="Artist" tag="2" id="u4H-Dg-SBy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <action selector="useArtist:" target="-2" id="Cse-rj-kD7"/>
+                                                </connections>
                                             </menuItem>
                                             <menuItem isSeparatorItem="YES" id="UZc-AC-LTl"/>
-                                            <menuItem title="Recent" enabled="NO" id="FGx-Au-DeM">
+                                            <menuItem title="Recent" tag="3" enabled="NO" id="FGx-Au-DeM">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                             </menuItem>
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
-                                <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             </popUpButton>
                         </subviews>
                         <constraints>

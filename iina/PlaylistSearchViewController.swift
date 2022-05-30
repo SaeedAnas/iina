@@ -19,6 +19,11 @@ fileprivate let TableCellFontSize = 13
 
 fileprivate let MinScore = 5 // Minimum matching score to be rendered on search results table
 
+fileprivate let MenuItemFileName = 1
+fileprivate let MenuItemArtist = 2
+fileprivate let MenuItemRecents = 3
+fileprivate let MenuItemRecentSearch = 101
+
 
 class PlaylistSearchViewController: NSWindowController {
   
@@ -37,6 +42,14 @@ class PlaylistSearchViewController: NSWindowController {
   // Click Monitor for detecting if a click occured on the main window, if so, then the search window will close
   private var clickMonitor: Any?
   private var isOpen = false
+  
+  // MARK: Menu Preferences
+  enum SearchOption {
+    case filename, artist
+  }
+  
+  var searchOption: SearchOption = .filename
+  var searchHistory: [String] = []
   
   // MARK: Search Results
   var searchResults: [SearchItem] = []
@@ -112,6 +125,16 @@ class PlaylistSearchViewController: NSWindowController {
   @IBOutlet weak var clearBtn: NSButton!
   @IBOutlet weak var searchResultsTableView: NSTableView!
   @IBOutlet weak var inputBorderBottom: NSBox!
+  @IBOutlet weak var searchPopUp: NSPopUpButton!
+  
+  @IBAction func useFileName(_ sender: Any) {
+    searchOption = .filename
+  }
+  
+  @IBAction func useArtist(_ sender: Any) {
+    Logger.log("helo")
+    searchOption = .artist
+  }
   
   override func windowDidLoad() {
     super.windowDidLoad()
@@ -137,6 +160,8 @@ class PlaylistSearchViewController: NSWindowController {
     
     // Delegates
     inputField.delegate = self
+    searchPopUp.menu?.delegate = self
+    searchPopUp.menu?.items.forEach{( $0.target = self )}
     
     searchResultsTableView.delegate = self
     searchResultsTableView.dataSource = self
@@ -219,6 +244,7 @@ class PlaylistSearchViewController: NSWindowController {
   // MARK: Input and SearchResults utilities
   
   func clearInput() {
+    searchWorkItem?.cancel()
     inputField.stringValue = ""
     isInputEmpty = true
     hideClearBtn()
@@ -279,9 +305,27 @@ class PlaylistSearchViewController: NSWindowController {
     
   }
   
+  func addSearchHistory(input: String) {
+    searchHistory.removeAll { item in
+      item == input
+    }
+    
+    searchHistory.insert(input, at: 0)
+    
+    if searchHistory.count > 10 {
+      searchHistory.removeLast()
+    }
+  }
+  
+  func clearHistory() {
+    searchHistory.removeAll()
+  }
+  
   @objc func handleSubmit() {
     guard let item = searchResults[at: searchResultsTableView.selectedRow] ?? searchResults.first else { return }
     guard let index = getPlaylistIndex(searchItem: item) else { return }
+    
+    addSearchHistory(input: inputField.stringValue)
     
     player.playFileInPlaylist(index)
     
@@ -290,16 +334,10 @@ class PlaylistSearchViewController: NSWindowController {
     hideSearchWindow()
   }
   
-}
-
-// MARK: Input Text Field Delegate
-extension PlaylistSearchViewController: NSTextFieldDelegate, NSControlTextEditingDelegate {
-  func controlTextDidChange(_ obj: Notification) {
-    var input = inputField.stringValue
-    
+  func search(input: String) {
     // Removes spaces from pattern
     // If your input was "hello world", the fuzzy match wouldn't match "helloworld" as a favorable option because of the space in between the two words
-    input = input.filter {!$0.isWhitespace}
+    let input = input.filter {!$0.isWhitespace}
     
     searchWorkItem?.cancel()
     
@@ -332,6 +370,14 @@ extension PlaylistSearchViewController: NSTextFieldDelegate, NSControlTextEditin
     
   }
   
+}
+
+// MARK: Input Text Field Delegate
+extension PlaylistSearchViewController: NSTextFieldDelegate, NSControlTextEditingDelegate {
+  func controlTextDidChange(_ obj: Notification) {
+    search(input: inputField.stringValue)
+  }
+  
   func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
     // Esc: clear input or hide window
     if commandSelector == #selector(cancel(_:)) {
@@ -357,6 +403,58 @@ extension PlaylistSearchViewController: NSTextFieldDelegate, NSControlTextEditin
       return false
     }
     return false
+  }
+  
+}
+
+// MARK: Menu Delegate
+extension PlaylistSearchViewController: NSMenuDelegate, NSMenuItemValidation {
+  @IBAction func changeSearch(_ sender: NSMenuItem) {
+    inputField.stringValue = sender.title
+    search(input: inputField.stringValue)
+  }
+  
+  @IBAction func clearSearchHistory(_ sender: NSMenuItem) {
+    searchHistory.removeAll()
+  }
+  
+  func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+    switch menuItem.tag {
+    case MenuItemFileName:
+      menuItem.state = searchOption == .filename ? .on : .off
+    case MenuItemArtist:
+      menuItem.state = searchOption == .artist ? .on : .off
+    default:
+      break
+    }
+    
+    return menuItem.isEnabled
+  }
+  
+  func menuWillOpen(_ menu: NSMenu) {
+    menu.items.forEach { item in
+      if item.tag == MenuItemRecents {
+        item.title = searchHistory.isEmpty ? "No Recent Searches" : "Recent Searches"
+      }
+      if item.tag == MenuItemRecentSearch {
+        menu.removeItem(item)
+      }
+    }
+    
+    if !searchHistory.isEmpty {
+      searchHistory.forEach { history in
+        menu.addItem(withTitle: history, action: #selector(self.changeSearch(_:)), tag: MenuItemRecentSearch)
+      }
+      let separator = NSMenuItem.separator()
+      separator.tag = MenuItemRecentSearch
+      menu.addItem(separator)
+      menu.addItem(withTitle: "Clear Searches", action: #selector(self.clearSearchHistory(_:)), tag: MenuItemRecentSearch)
+      
+    } else {
+      let separator = NSMenuItem.separator()
+      separator.tag = MenuItemRecentSearch
+      menu.addItem(separator)
+    }
   }
 }
 
