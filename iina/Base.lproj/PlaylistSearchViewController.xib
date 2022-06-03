@@ -188,6 +188,13 @@
                                                     <action selector="useArtist:" target="-2" id="Cse-rj-kD7"/>
                                                 </connections>
                                             </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="wG1-y1-2JG"/>
+                                            <menuItem title="Thumbnails" tag="5" id="4mE-bn-ePo">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <action selector="useThumbnail:" target="-2" id="RZa-wF-7Uq"/>
+                                                </connections>
+                                            </menuItem>
                                             <menuItem isSeparatorItem="YES" id="UZc-AC-LTl"/>
                                             <menuItem title="Recent" tag="4" enabled="NO" id="FGx-Au-DeM">
                                                 <modifierMask key="keyEquivalentModifierMask"/>

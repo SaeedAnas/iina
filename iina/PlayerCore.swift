@@ -1794,26 +1794,28 @@ class PlayerCore: NSObject {
    It may take some time to run this method, so it should be used in background.
    */
   func refreshCachedVideoInfo(forVideoPath path: String) {
-    guard let dict = FFmpegController.probeVideoInfo(forFile: path) else { return }
-    let progress = Utility.playbackProgressFromWatchLater(path.md5)
-    self.info.setCachedVideoDurationAndProgress(path, (
-      duration: dict["@iina_duration"] as? Double,
-      progress: progress?.second
-    ))
+    let url = URL(fileURLWithPath: path)
+    
+    let asset = AVAsset(url: url) as AVAsset
     var result: (title: String?, album: String?, artist: String?)
-    dict.forEach { (k, v) in
-      guard let key = k as? String else { return }
-      switch key.lowercased() {
-      case "title":
-        result.title = v as? String
-      case "album":
-        result.album = v as? String
-      case "artist":
-        result.artist = v as? String
-      default:
-        break
+    for data in asset.commonMetadata {
+      if data.commonKey == .commonKeyTitle {
+        result.title = data.value as? String
+      }
+      else if data.commonKey ==  .commonKeyArtist {
+        result.artist = data.value as? String
+      }
+      else if data.commonKey ==  .commonKeyAlbumName {
+        result.album = data.value as? String
       }
     }
+
+    let progress = Utility.playbackProgressFromWatchLater(path.md5)
+    self.info.setCachedVideoDurationAndProgress(path, (
+      duration: asset.duration.seconds,
+      progress: progress?.second
+    ))
+    
     self.info.setCachedMetadata(path, result)
   }
 

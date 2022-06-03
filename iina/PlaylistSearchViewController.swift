@@ -24,6 +24,7 @@ fileprivate let MenuItemFileName = 1
 fileprivate let MenuItemTitle = 2
 fileprivate let MenuItemArtist = 3
 fileprivate let MenuItemRecents = 4
+fileprivate let MenuItemThumbnail = 5
 fileprivate let MenuItemRecentSearch = 101
 
 
@@ -48,11 +49,13 @@ class PlaylistSearchViewController: NSWindowController {
   // MARK: Menu Preferences
   var searchOptions: [SearchOption] = [.filename, .artist, .title]
   var searchHistory: [String] = []
+  var useThumbnail = true
   
   // MARK: Search Results
   var searchResults: [SearchItem] = []
   var thumbnails: [String: NSImage] = [:]
   var thumbnailWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistThumbnailTask", qos: .userInitiated)
+  var thumbnailSemaphore = DispatchSemaphore(value: 1)
   // Run the fuzzy matching in a different thread so we don't pause the inputField
   var searchWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistSearchTask", qos: .userInitiated)
   // Make the searching cancellable so we aren't searching for a pattern when the pattern has changed
@@ -138,6 +141,14 @@ class PlaylistSearchViewController: NSWindowController {
     toggleOption(.artist)
   }
   
+  @IBAction func useThumbnail(_ sender: Any) {
+    useThumbnail = !useThumbnail
+    if !useThumbnail {
+      thumbnails.removeAll()
+    }
+    reloadTable()
+  }
+  
   func toggleOption(_ option: SearchOption) {
     if searchOptions.contains(option) {
       searchOptions.removeAll {
@@ -181,6 +192,10 @@ class PlaylistSearchViewController: NSWindowController {
     
     searchResultsTableView.doubleAction = #selector(handleSubmit)
     searchResultsTableView.action = #selector(handleSubmit)
+    
+    metadataWorkQueue.async {
+      self.indexPlaylist(playlist: self.player.info.playlist)
+    }
   }
   
   // MARK: Showing and Hiding Window and Elements
@@ -263,6 +278,7 @@ class PlaylistSearchViewController: NSWindowController {
     hideClearBtn()
     clearSearchResults()
     focusInput()
+    thumbnails.removeAll()
   }
   
   func clearSearchResults() {
@@ -386,7 +402,7 @@ class PlaylistSearchViewController: NSWindowController {
   
   var metadataCache: [String : (title: String?, album: String?, artist: String?, duration: Double?)] = [:]
   var metadataWorkQueue: DispatchQueue = DispatchQueue(label: "IINAPlaylistMetadataTask", qos: .userInitiated)
-  let semaphore = DispatchSemaphore(value: 1)
+  let metadataSemaphore = DispatchSemaphore(value: 1)
   
   func indexImage(file: String) {
     let url = URL(fileURLWithPath: file)
@@ -395,7 +411,9 @@ class PlaylistSearchViewController: NSWindowController {
       if data.commonKey == .commonKeyArtwork {
         let imageData = data.value as! Data
         let image = NSImage(data: imageData)
+        thumbnailSemaphore.wait()
         self.thumbnails[file] = image
+        thumbnailSemaphore.signal()
         return
       }
       if url.pathExtension != "mp3" {
@@ -414,7 +432,9 @@ class PlaylistSearchViewController: NSWindowController {
         do {
           let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(value: time, timescale: 1), actualTime: nil)
           let image = NSImage(cgImage: cgImage, size: NSMakeSize(CGFloat(cgImage.width), CGFloat(cgImage.height)))
+          thumbnailSemaphore.wait()
           self.thumbnails[file] = image
+          thumbnailSemaphore.signal()
           return
         }
         catch let error {
@@ -445,20 +465,51 @@ class PlaylistSearchViewController: NSWindowController {
     
   }
   
-  func indexFile(file: String) {
-        let metadata = getMetadata(file: file)
-        semaphore.wait()
+  func iinaMetadata(file: String) -> (title: String?, album: String?, artist: String?, duration: Double?) {
+    var metadata: (title: String?, album: String?, artist: String?, duration: Double?) = (nil, nil, nil, nil)
+    player.refreshCachedVideoInfo(forVideoPath: file)
+    if let cache = player.info.getCachedMetadata(file) {
+      metadata.title = cache.title
+      metadata.artist = cache.artist
+      metadata.album = cache.album
+    }
+    
+    if let data = player.info.getCachedVideoDurationAndProgress(file), let duration = data.duration {
+      metadata.duration = duration
+    }
+    
+    return metadata
+  }
+  
+  func syncIndexPlaylist(playlist: [MPVPlaylistItem]) {
+    for item in playlist {
+      let file = item.filename
+      if self.metadataCache[file] == nil {
+        //        let metadata = self.getMetadata(file: file)
+        let metadata = self.iinaMetadata(file: file)
+        metadataSemaphore.wait()
         metadataCache[file] = metadata
-        semaphore.signal()
+        metadataSemaphore.signal()
+      }
+    }
+  }
+  
+  func indexFile(file: String) {
+    let metadata = getMetadata(file: file)
+    metadataSemaphore.wait()
+    metadataCache[file] = metadata
+    metadataSemaphore.signal()
+  }
+  
+  func iinaIndexFile(file: String) {
+    let metadata = iinaMetadata(file: file)
+    metadataSemaphore.wait()
+    metadataCache[file] = metadata
+    metadataSemaphore.signal()
   }
   
   func indexPlaylist(playlist: [MPVPlaylistItem]) {
-    
-    if metadataCache.count == playlist.count {
-      return
-    }
-    
-    let size = playlist.count / 10
+    let size = playlist.count < 10 ? 1 : playlist.count / 10
     let group = DispatchGroup()
     for i in stride(from: 0, to: playlist.count, by: size) {
       metadataWorkQueue.async {
@@ -466,7 +517,10 @@ class PlaylistSearchViewController: NSWindowController {
         let chunk = playlist[i..<min(i+size, playlist.count)]
         for item in chunk {
           if self.metadataCache[item.filename] == nil {
-            self.indexFile(file: item.filename)
+            if !item.isNetworkResource {
+            self.iinaIndexFile(file: item.filename)
+            //            self.indexFile(file: item.filename)
+            }
           }
         }
         group.leave()
@@ -482,11 +536,23 @@ class PlaylistSearchViewController: NSWindowController {
     }
     
     indexPlaylist(playlist: playlist)
+    //    syncIndexPlaylist(playlist: playlist)
     
     var results: [SearchItem] = []
     
     for (index, item) in playlist.enumerated() {
+      if item.isNetworkResource {
+        let result = fuzzyMatch(text: item.filenameForDisplay, pattern: pattern)
+        if result.score < MinScore {
+          continue
+        }
+        let searchItem = SearchItem(item: item, result: result, playlistIndex: index, option: .filename, text: item.filenameForDisplay)
+        results.append(searchItem)
+        continue
+      }
+      metadataSemaphore.wait()
       let metadata = metadataCache[item.filename]
+      metadataSemaphore.signal()
       var options: [(result: Result, option: SearchOption, text: String)] = []
       for option in searchOptions {
         switch option {
@@ -510,6 +576,12 @@ class PlaylistSearchViewController: NSWindowController {
       let result = options[0].result
       let option = options[0].option
       let text = options[0].text
+      
+      
+        if result.score < MinScore {
+          continue
+        }
+      
       let searchItem = SearchItem(item: item, result: result, playlistIndex: index, option: option, text: text)
       
       results.append(searchItem)
@@ -577,6 +649,8 @@ extension PlaylistSearchViewController: NSMenuDelegate, NSMenuItemValidation {
       menuItem.state = searchOptions.contains(.artist) ? .on : .off
     case MenuItemTitle:
       menuItem.state = searchOptions.contains(.title) ? .on : .off
+    case MenuItemThumbnail:
+      menuItem.state = useThumbnail ? .on : .off
     default:
       break
     }
@@ -629,7 +703,35 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
     
     let item = searchItem.item
     
+    if item.isNetworkResource {
+      // Add bold for matching letters
+      for index in searchItem.result.pos {
+        let range = NSMakeRange(index , 1)
+        render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
+        render.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.textColor, range: range)
+      }
+      
+      if #available(macOS 11.0, *) {
+        return [
+          "name": render,
+          "artist": "",
+          "duration": "",
+          "image": NSWorkspace.shared.icon(for: .heic)
+        ]
+      } else {
+        // Fallback on earlier versions
+        return [
+          "name": render,
+          "artist": "",
+          "duration": "",
+          "image": NSWorkspace.shared.icon(forFileType: "html")
+        ]
+      }
+    }
+    
+    metadataSemaphore.wait()
     let metadata = metadataCache[item.filename]
+    metadataSemaphore.signal()
     if metadata == nil {
       DispatchQueue.main.async {
         self.indexFile(file: item.filename)
@@ -643,17 +745,21 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
     }
     
     var image = NSWorkspace.shared.icon(forFile: item.filename)
-    if let thumbnail = thumbnails[item.filename] {
-      image = thumbnail
-    } else {
-      thumbnailWorkQueue.async {
-        self.indexImage(file: item.filename)
-        if self.thumbnails[item.filename] != nil {
-          DispatchQueue.main.async {
-            self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
+    if useThumbnail {
+      thumbnailSemaphore.wait()
+      if let thumbnail = thumbnails[item.filename] {
+        image = thumbnail
+      } else {
+        thumbnailWorkQueue.async {
+          self.indexImage(file: item.filename)
+          if self.thumbnails[item.filename] != nil {
+            DispatchQueue.main.async {
+              self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
+            }
           }
         }
       }
+      thumbnailSemaphore.signal()
     }
     
     if searchItem.option == .artist {
