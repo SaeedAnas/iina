@@ -54,7 +54,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="601" height="141"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" red="0.34140368589420911" green="0.34140368589420911" blue="0.34140368589420911" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                            <tableViewGridLines key="gridStyleMask" horizontal="YES"/>
+                                            <color key="gridColor" red="1" green="1" blue="1" alpha="0.1021034013851945" colorSpace="custom" customColorSpace="sRGB"/>
                                             <tableColumns>
                                                 <tableColumn identifier="ImageColumn" width="30" minWidth="10" maxWidth="3.4028234663852886e+38" id="Rm4-Hu-Fd5">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
@@ -110,28 +111,41 @@
                                                             <rect key="frame" x="36" y="0.0" width="565" height="40"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8C6-uH-87G">
-                                                                    <rect key="frame" x="6" y="21" width="499" height="16"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="name" usesSingleLineMode="YES" id="sQg-Vu-uM1">
-                                                                        <font key="font" usesAppearanceFont="YES"/>
-                                                                        <color key="textColor" name="SearchResult"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                    <connections>
-                                                                        <binding destination="oJZ-0o-tBC" name="value" keyPath="objectValue.name" id="CE4-x6-WMA"/>
-                                                                    </connections>
-                                                                </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GwQ-aC-EbV">
-                                                                    <rect key="frame" x="6" y="3" width="499" height="14"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Artist" usesSingleLineMode="YES" id="lp2-nB-2E2">
-                                                                        <font key="font" metaFont="smallSystemBold"/>
-                                                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                    <connections>
-                                                                        <binding destination="oJZ-0o-tBC" name="value" keyPath="objectValue.artist" id="grc-Of-BIx"/>
-                                                                    </connections>
-                                                                </textField>
+                                                                <stackView distribution="fillEqually" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wf4-1N-Pjp">
+                                                                    <rect key="frame" x="8" y="3" width="495" height="34"/>
+                                                                    <subviews>
+                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8C6-uH-87G">
+                                                                            <rect key="frame" x="-2" y="18" width="38" height="16"/>
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="name" usesSingleLineMode="YES" id="sQg-Vu-uM1">
+                                                                                <font key="font" usesAppearanceFont="YES"/>
+                                                                                <color key="textColor" name="SearchResult"/>
+                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                            <connections>
+                                                                                <binding destination="oJZ-0o-tBC" name="value" keyPath="objectValue.name" id="CE4-x6-WMA"/>
+                                                                            </connections>
+                                                                        </textField>
+                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GwQ-aC-EbV">
+                                                                            <rect key="frame" x="-2" y="0.0" width="36" height="14"/>
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Artist" usesSingleLineMode="YES" id="lp2-nB-2E2">
+                                                                                <font key="font" metaFont="smallSystemBold"/>
+                                                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                            <connections>
+                                                                                <binding destination="oJZ-0o-tBC" name="value" keyPath="objectValue.artist" id="grc-Of-BIx"/>
+                                                                            </connections>
+                                                                        </textField>
+                                                                    </subviews>
+                                                                    <visibilityPriorities>
+                                                                        <integer value="1000"/>
+                                                                        <integer value="1000"/>
+                                                                    </visibilityPriorities>
+                                                                    <customSpacing>
+                                                                        <real value="3.4028234663852886e+38"/>
+                                                                        <real value="3.4028234663852886e+38"/>
+                                                                    </customSpacing>
+                                                                </stackView>
                                                                 <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Q7-ew-rZX">
                                                                     <rect key="frame" x="509" y="13" width="50" height="14"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Duration" id="xLO-jq-Jib">
@@ -145,14 +159,11 @@
                                                                 </textField>
                                                             </subviews>
                                                             <constraints>
-                                                                <constraint firstItem="8C6-uH-87G" firstAttribute="top" secondItem="oJZ-0o-tBC" secondAttribute="top" constant="3" id="0il-Ud-hEz"/>
-                                                                <constraint firstAttribute="bottom" secondItem="GwQ-aC-EbV" secondAttribute="bottom" constant="3" id="86D-z3-tfn"/>
-                                                                <constraint firstItem="8C6-uH-87G" firstAttribute="leading" secondItem="oJZ-0o-tBC" secondAttribute="leading" constant="8" id="K0o-7n-py0"/>
                                                                 <constraint firstAttribute="trailing" secondItem="4Q7-ew-rZX" secondAttribute="trailing" constant="8" id="PgL-4d-xF0"/>
-                                                                <constraint firstItem="4Q7-ew-rZX" firstAttribute="leading" secondItem="GwQ-aC-EbV" secondAttribute="trailing" constant="8" id="Rlu-9m-9a5"/>
-                                                                <constraint firstItem="GwQ-aC-EbV" firstAttribute="leading" secondItem="oJZ-0o-tBC" secondAttribute="leading" constant="8" id="k6D-Ee-czb"/>
+                                                                <constraint firstItem="wf4-1N-Pjp" firstAttribute="leading" secondItem="oJZ-0o-tBC" secondAttribute="leading" constant="8" id="ejw-ph-6N9"/>
+                                                                <constraint firstItem="wf4-1N-Pjp" firstAttribute="centerY" secondItem="oJZ-0o-tBC" secondAttribute="centerY" id="grg-eS-lgy"/>
+                                                                <constraint firstItem="4Q7-ew-rZX" firstAttribute="leading" secondItem="wf4-1N-Pjp" secondAttribute="trailing" constant="8" id="pLZ-1v-llt"/>
                                                                 <constraint firstItem="4Q7-ew-rZX" firstAttribute="centerY" secondItem="oJZ-0o-tBC" secondAttribute="centerY" id="rGC-TR-J3l"/>
-                                                                <constraint firstItem="4Q7-ew-rZX" firstAttribute="leading" secondItem="8C6-uH-87G" secondAttribute="trailing" constant="8" id="vLS-ad-gIQ"/>
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="artistView" destination="GwQ-aC-EbV" id="x0K-k5-rEp"/>

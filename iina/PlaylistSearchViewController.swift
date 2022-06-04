@@ -796,16 +796,17 @@ class SearchInfoCellView: NSTableCellView {
   }
   
   func setMetadata(_ metadata: Metadata?) {
-    var artistText = ""
     var durationText = ""
     if let artist = metadata?.artist {
-      artistText = artist
+      artistView.isHidden = false
+      artistView.stringValue = artist
+    } else {
+      artistView.isHidden = true
     }
     if let duration = metadata?.duration {
       durationText = VideoTime(duration).stringRepresentation
     }
     
-    artistView.stringValue = artistText
     durationView.stringValue = durationText
   }
 }
