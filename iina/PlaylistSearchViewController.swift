@@ -188,6 +188,7 @@ class PlaylistSearchViewController: NSWindowController {
     
     // Delegates
     inputField.delegate = self
+    searchPopUp.target = self
     searchPopUp.menu?.delegate = self
     searchPopUp.menu?.items.forEach{( $0.target = self )}
     

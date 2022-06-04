@@ -34,7 +34,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="irS-JS-r5D">
-                                <rect key="frame" x="45" y="150" width="519" height="17"/>
+                                <rect key="frame" x="44" y="150" width="520" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search" usesSingleLineMode="YES" id="HQ2-9h-L2Z">
                                     <font key="font" metaFont="system" size="14"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -200,7 +200,7 @@
                                 </connections>
                             </button>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Cwa-38-Pc7">
-                                <rect key="frame" x="3" y="150" width="36" height="16"/>
+                                <rect key="frame" x="3" y="150" width="35" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="25" id="nS4-km-Sjd"/>
                                 </constraints>
@@ -209,9 +209,10 @@
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" id="L2M-ZE-4PO">
                                         <items>
-                                            <menuItem tag="200" hidden="YES" id="8e8-Tj-hdh">
+                                            <menuItem tag="200" hidden="YES" enabled="NO" id="8e8-Tj-hdh">
                                                 <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="medium"/>
                                             </menuItem>
+                                            <menuItem isSeparatorItem="YES" id="5AU-ma-mUg"/>
                                             <menuItem title="Search By" enabled="NO" id="0u8-Su-avJ"/>
                                             <menuItem title="File Name" tag="1" id="rkT-F2-uLy">
                                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -276,7 +277,7 @@
         </window>
     </objects>
     <resources>
-        <image name="magnifyingglass" catalog="system" width="16" height="15"/>
+        <image name="magnifyingglass" catalog="system" width="15" height="15"/>
         <image name="xmark.circle.fill" catalog="system" width="15" height="15"/>
         <namedColor name="SearchResult">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
