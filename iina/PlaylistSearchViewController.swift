@@ -10,7 +10,7 @@ import Foundation
 import Cocoa
 import AVFoundation
 
-fileprivate let WindowWidth = 600
+fileprivate let WindowWidth = 300
 fileprivate let InputFieldHeight = 46
 fileprivate let TableCellHeight = 40
 fileprivate let MaxTableViewHeight = TableCellHeight * 10
@@ -787,6 +787,7 @@ class FixRowView: NSTableRowView {
 
 class SearchInfoCellView: NSTableCellView {
   @IBOutlet weak var titleView: NSTextField!
+  
   @IBOutlet weak var artistView: NSTextField!
   @IBOutlet weak var durationView: NSTextField!
   
