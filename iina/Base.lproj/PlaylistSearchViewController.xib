@@ -34,24 +34,24 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="irS-JS-r5D">
-                                <rect key="frame" x="48" y="137" width="516" height="28"/>
+                                <rect key="frame" x="45" y="150" width="519" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search" usesSingleLineMode="YES" id="HQ2-9h-L2Z">
-                                    <font key="font" metaFont="systemLight" size="24"/>
+                                    <font key="font" metaFont="system" size="14"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="935-W7-cww">
-                                <rect key="frame" x="0.0" y="123" width="601" height="5"/>
+                                <rect key="frame" x="0.0" y="138" width="601" height="5"/>
                             </box>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="40" horizontalPageScroll="10" verticalLineScroll="40" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rsh-a6-Fcr">
-                                <rect key="frame" x="0.0" y="0.0" width="601" height="125"/>
+                                <rect key="frame" x="0.0" y="0.0" width="601" height="141"/>
                                 <clipView key="contentView" drawsBackground="NO" id="7Rk-nd-pyH">
-                                    <rect key="frame" x="0.0" y="0.0" width="601" height="125"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="601" height="141"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="40" rowSizeStyle="automatic" viewBased="YES" id="1hl-4W-Z2Q">
-                                            <rect key="frame" x="0.0" y="0.0" width="601" height="125"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="601" height="141"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" red="0.34140368589420911" green="0.34140368589420911" blue="0.34140368589420911" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -124,7 +124,7 @@
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="GwQ-aC-EbV">
                                                                     <rect key="frame" x="6" y="3" width="499" height="14"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Artist" usesSingleLineMode="YES" id="lp2-nB-2E2">
-                                                                        <font key="font" metaFont="systemBold" size="11"/>
+                                                                        <font key="font" metaFont="smallSystemBold"/>
                                                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
@@ -176,9 +176,9 @@
                                 </scroller>
                             </scrollView>
                             <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GAl-oE-YmZ">
-                                <rect key="frame" x="570" y="130" width="15" height="38"/>
+                                <rect key="frame" x="570" y="146" width="15" height="22"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="0tb-ql-wxO"/>
+                                    <constraint firstAttribute="height" constant="16" id="0tb-ql-wxO"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="xmark.circle.fill" catalog="system" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="6S1-A3-ScO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -189,14 +189,17 @@
                                 </connections>
                             </button>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Cwa-38-Pc7">
-                                <rect key="frame" x="3" y="140" width="39" height="19"/>
-                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="overlaps" alignment="left" lineBreakMode="truncatingTail" tag="200" imageScaling="proportionallyDown" inset="2" pullsDown="YES" altersStateOfSelectedItem="NO" id="0Le-KP-EtU">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                <rect key="frame" x="3" y="150" width="36" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="25" id="nS4-km-Sjd"/>
+                                </constraints>
+                                <popUpButtonCell key="cell" type="bevel" bezelStyle="rounded" imagePosition="right" alignment="left" lineBreakMode="truncatingTail" tag="200" imageScaling="proportionallyDown" inset="2" pullsDown="YES" altersStateOfSelectedItem="NO" id="0Le-KP-EtU">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" id="L2M-ZE-4PO">
                                         <items>
                                             <menuItem tag="200" hidden="YES" id="8e8-Tj-hdh">
-                                                <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="large"/>
+                                                <imageReference key="image" image="magnifyingglass" catalog="system" symbolScale="medium"/>
                                             </menuItem>
                                             <menuItem title="Search By" enabled="NO" id="0u8-Su-avJ"/>
                                             <menuItem title="File Name" tag="1" id="rkT-F2-uLy">
@@ -231,23 +234,24 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
-                                <color key="bezelColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             </popUpButton>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="935-W7-cww" secondAttribute="trailing" id="04m-Lb-dAG"/>
-                            <constraint firstItem="rsh-a6-Fcr" firstAttribute="top" secondItem="935-W7-cww" secondAttribute="bottom" id="58u-H3-vLG"/>
                             <constraint firstAttribute="bottom" secondItem="rsh-a6-Fcr" secondAttribute="bottom" id="5BS-05-SHh"/>
-                            <constraint firstItem="935-W7-cww" firstAttribute="top" secondItem="GAl-oE-YmZ" secondAttribute="bottom" constant="7" id="5JG-Ym-Z5b"/>
+                            <constraint firstItem="935-W7-cww" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="32" id="5eV-Vu-RJm"/>
+                            <constraint firstItem="rsh-a6-Fcr" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="32" id="82v-pN-Zns"/>
                             <constraint firstItem="GAl-oE-YmZ" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="Bhe-2V-pKp"/>
                             <constraint firstAttribute="trailing" secondItem="rsh-a6-Fcr" secondAttribute="trailing" id="FM9-rn-UoX"/>
                             <constraint firstItem="935-W7-cww" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" id="IR0-vm-ueq"/>
-                            <constraint firstItem="Cwa-38-Pc7" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="14" id="Iel-5s-wd2"/>
+                            <constraint firstItem="Cwa-38-Pc7" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="7" id="Iel-5s-wd2"/>
                             <constraint firstItem="Cwa-38-Pc7" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" constant="8" id="SXx-n9-dLJ"/>
+                            <constraint firstItem="935-W7-cww" firstAttribute="top" secondItem="Cwa-38-Pc7" secondAttribute="bottom" constant="9" id="cgX-vX-XoR"/>
                             <constraint firstAttribute="trailing" secondItem="GAl-oE-YmZ" secondAttribute="trailing" constant="16" id="hwW-iV-BMa"/>
                             <constraint firstItem="rsh-a6-Fcr" firstAttribute="leading" secondItem="Fx8-km-fPU" secondAttribute="leading" id="nbQ-Td-UW7"/>
-                            <constraint firstItem="irS-JS-r5D" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="8" id="qH0-2M-Iy4"/>
+                            <constraint firstItem="irS-JS-r5D" firstAttribute="top" secondItem="Fx8-km-fPU" secondAttribute="top" constant="6" id="qH0-2M-Iy4"/>
                             <constraint firstItem="GAl-oE-YmZ" firstAttribute="leading" secondItem="irS-JS-r5D" secondAttribute="trailing" constant="8" id="uWa-Jq-VQt"/>
                             <constraint firstItem="irS-JS-r5D" firstAttribute="leading" secondItem="Cwa-38-Pc7" secondAttribute="trailing" constant="8" id="zWs-kG-eUk"/>
                         </constraints>
@@ -261,7 +265,7 @@
         </window>
     </objects>
     <resources>
-        <image name="magnifyingglass" catalog="system" width="19" height="19"/>
+        <image name="magnifyingglass" catalog="system" width="16" height="15"/>
         <image name="xmark.circle.fill" catalog="system" width="15" height="15"/>
         <namedColor name="SearchResult">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>

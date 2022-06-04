@@ -11,7 +11,7 @@ import Cocoa
 import AVFoundation
 
 fileprivate let WindowWidth = 300
-fileprivate let InputFieldHeight = 46
+fileprivate let InputFieldHeight = 32
 fileprivate let TableCellHeight = 40
 fileprivate let MaxTableViewHeight = TableCellHeight * 10
 fileprivate let BottomMargin = 6
