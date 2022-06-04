@@ -27,6 +27,7 @@ fileprivate let MenuItemRecents = 4
 fileprivate let MenuItemThumbnail = 5
 fileprivate let MenuItemRecentSearch = 101
 
+typealias Metadata = (title: String?, album: String?, artist: String?, duration: Double?)
 
 class PlaylistSearchViewController: NSWindowController {
   
@@ -145,6 +146,9 @@ class PlaylistSearchViewController: NSWindowController {
     useThumbnail = !useThumbnail
     if !useThumbnail {
       thumbnails.removeAll()
+      searchResultsTableView.tableColumns[0].isHidden = true
+    } else {
+      searchResultsTableView.tableColumns[0].isHidden = false
     }
     reloadTable()
   }
@@ -518,8 +522,8 @@ class PlaylistSearchViewController: NSWindowController {
         for item in chunk {
           if self.metadataCache[item.filename] == nil {
             if !item.isNetworkResource {
-            self.iinaIndexFile(file: item.filename)
-            //            self.indexFile(file: item.filename)
+              self.iinaIndexFile(file: item.filename)
+              //            self.indexFile(file: item.filename)
             }
           }
         }
@@ -578,9 +582,9 @@ class PlaylistSearchViewController: NSWindowController {
       let text = options[0].text
       
       
-        if result.score < MinScore {
-          continue
-        }
+      if result.score < MinScore {
+        continue
+      }
       
       let searchItem = SearchItem(item: item, result: result, playlistIndex: index, option: option, text: text)
       
@@ -692,105 +696,77 @@ extension PlaylistSearchViewController: NSTableViewDelegate, NSTableViewDataSour
     return searchResults.count
   }
   
-  func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-    
+  func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
     if searchResults.isEmpty {
       return nil
     }
     
-    let searchItem = searchResults[row]
-    let render = NSMutableAttributedString(string: searchItem.text)
     
+    guard let identifier = tableColumn?.identifier else { return nil }
+    let v = tableView.makeView(withIdentifier: identifier, owner: self) as! NSTableCellView
+    
+    let searchItem = searchResults[row]
     let item = searchItem.item
     
-    if item.isNetworkResource {
-      // Add bold for matching letters
-      for index in searchItem.result.pos {
-        let range = NSMakeRange(index , 1)
-        render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
-        render.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.textColor, range: range)
+    if identifier == .imageColumn {
+      if useThumbnail {
+        let imageView = v as! SearchImageCellView
+        var image = NSWorkspace.shared.icon(forFile: item.filename)
+        thumbnailSemaphore.wait()
+        if let thumbnail = thumbnails[item.filename] {
+          image = thumbnail
+        } else {
+          thumbnailWorkQueue.async {
+            self.indexImage(file: item.filename)
+            self.thumbnailSemaphore.wait()
+            if let thumbnail = self.thumbnails[item.filename] {
+              DispatchQueue.main.async {
+                imageView.setImage(thumbnail)
+              }
+            }
+            self.thumbnailSemaphore.signal()
+          }
+        }
+        thumbnailSemaphore.signal()
+        imageView.setImage(image)
+        
+        return imageView
+      }
+      return nil
+    }
+    
+    if identifier == .infoColumn {
+      let infoView = v as! SearchInfoCellView
+      
+      if searchItem.option == .title {
+        infoView.setText(searchItem.text)
+      } else {
+        infoView.setText(item.filenameForDisplay)
       }
       
-      if #available(macOS 11.0, *) {
-        return [
-          "name": render,
-          "artist": "",
-          "duration": "",
-          "image": NSWorkspace.shared.icon(for: .heic)
-        ]
-      } else {
-        // Fallback on earlier versions
-        return [
-          "name": render,
-          "artist": "",
-          "duration": "",
-          "image": NSWorkspace.shared.icon(forFileType: "html")
-        ]
-      }
-    }
-    
-    metadataSemaphore.wait()
-    let metadata = metadataCache[item.filename]
-    metadataSemaphore.signal()
-    if metadata == nil {
-      DispatchQueue.main.async {
-        self.indexFile(file: item.filename)
-        self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
-      }
-    }
-    
-    var durationLabel: String = ""
-    if let duration = metadata?.duration {
-      durationLabel = VideoTime(duration).stringRepresentation
-    }
-    
-    var image = NSWorkspace.shared.icon(forFile: item.filename)
-    if useThumbnail {
-      thumbnailSemaphore.wait()
-      if let thumbnail = thumbnails[item.filename] {
-        image = thumbnail
-      } else {
-        thumbnailWorkQueue.async {
-          self.indexImage(file: item.filename)
-          if self.thumbnails[item.filename] != nil {
-            DispatchQueue.main.async {
-              self.searchResultsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
-            }
+      metadataSemaphore.wait()
+      let metadata = metadataCache[item.filename]
+      metadataSemaphore.signal()
+      
+      if metadata == nil {
+        DispatchQueue.main.async {
+          self.indexFile(file: item.filename)
+          self.metadataSemaphore.wait()
+          let metadata = self.metadataCache[item.filename]
+          self.metadataSemaphore.signal()
+          if metadata != nil {
+            infoView.setMetadata(metadata)
           }
         }
       }
-      thumbnailSemaphore.signal()
+      infoView.setMetadata(metadata)
+      
+      return infoView
     }
     
-    if searchItem.option == .artist {
-      
-      return [
-        "name": item.filenameForDisplay,
-        "artist": searchItem.text,
-        "duration": durationLabel,
-        "image": image
-      ]
-      
-    } else {
-      let artistLabel = metadata?.artist ?? ""
-      
-      // Add bold for matching letters
-      for index in searchItem.result.pos {
-        let range = NSMakeRange(index , 1)
-        render.addAttribute(NSAttributedString.Key.font, value: NSFont.boldSystemFont(ofSize: CGFloat(TableCellFontSize)), range: range)
-        render.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.textColor, range: range)
-      }
-      
-      return [
-        "name": render,
-        "artist": artistLabel,
-        "duration": durationLabel,
-        "image": image
-      ]
-      
-    }
+    return nil
   }
-  
+
   // Enables arrow keys to be used in tableview
   func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
     return true
@@ -808,6 +784,46 @@ class FixRowView: NSTableRowView {
     super.draw(dirtyRect)
   }
 }
+
+class SearchInfoCellView: NSTableCellView {
+  @IBOutlet weak var titleView: NSTextField!
+  @IBOutlet weak var artistView: NSTextField!
+  @IBOutlet weak var durationView: NSTextField!
+  
+  func setText(_ text: String) {
+    titleView.stringValue = text
+  }
+  
+  func setMetadata(_ metadata: Metadata?) {
+    var artistText = ""
+    var durationText = ""
+    if let artist = metadata?.artist {
+      artistText = artist
+    }
+    if let duration = metadata?.duration {
+      durationText = VideoTime(duration).stringRepresentation
+    }
+    
+    artistView.stringValue = artistText
+    durationView.stringValue = durationText
+  }
+}
+
+class SearchImageCellView: NSTableCellView {
+  @IBOutlet weak var thumbnailView:
+  NSImageView!
+  
+  func setImage(_ image: NSImage) {
+    thumbnailView.image = image
+  }
+  
+}
+
+extension NSUserInterfaceItemIdentifier {
+  static let infoColumn = NSUserInterfaceItemIdentifier("InfoColumn")
+  static let imageColumn = NSUserInterfaceItemIdentifier("ImageColumn")
+}
+
 
 // MARK: Search Playlist
 
