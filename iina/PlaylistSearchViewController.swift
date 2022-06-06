@@ -13,8 +13,8 @@ import AVFoundation
 fileprivate let WindowWidth = 300
 fileprivate let InputFieldHeight = 32
 fileprivate let TableCellHeight = 40
-fileprivate let MaxTableViewHeight = TableCellHeight * 10
-fileprivate let BottomMargin = 6
+fileprivate let MaxTableViewHeight = TableCellHeight * 7
+fileprivate let BottomMargin = 0
 
 fileprivate let TableCellFontSize = 13
 
@@ -215,6 +215,15 @@ class PlaylistSearchViewController: NSWindowController {
     isOpen = true
     
     addClickMonitor()
+    if player.isInMiniPlayer {
+      let w = player.miniPlayer.window!.convertToScreen(player.miniPlayer.backgroundView.frame)
+      window!.setFrameTopLeftPoint(w.origin)
+    } else {
+      let w = player.mainWindow.window!.convertToScreen(player.mainWindow.videoView.frame)
+      let offset = w.height / 4
+      let point = NSPoint(x: w.midX - CGFloat(WindowWidth/2), y: (w.midY - CGFloat(InputFieldHeight/2)) + offset)
+      window!.setFrameOrigin(point)
+    }
     showWindow(nil)
     focusInput()
   }
@@ -245,6 +254,13 @@ class PlaylistSearchViewController: NSWindowController {
     searchResultsTableView.isHidden = true
     inputBorderBottom.isHidden = true
     
+    if player.isInMiniPlayer {
+      let w = player.miniPlayer.window!.convertToScreen(playlistViewController.view.frame)
+      let size = NSMakeSize(w.width, CGFloat(InputFieldHeight))
+      window?.setContentSize(size)
+      return
+    }
+    
     let size = NSMakeSize(CGFloat(WindowWidth), CGFloat(InputFieldHeight))
     window?.setContentSize(size)
   }
@@ -259,14 +275,28 @@ class PlaylistSearchViewController: NSWindowController {
   }
   
   func resizeTable() {
-    let maxHeight = InputFieldHeight + MaxTableViewHeight + BottomMargin
+    var width: CGFloat = CGFloat(WindowWidth)
+    let height: CGFloat
+    
+    if player.isInMiniPlayer {
+      let w = player.miniPlayer.window!.convertToScreen(playlistViewController.view.frame)
+      
+      width = w.width
+      
+      if player.miniPlayer.isPlaylistVisible {
+        height = w.height
+        window?.setContentSize(NSMakeSize(width, height))
+        return
+      }
+    }
+    
+        let maxHeight = InputFieldHeight + MaxTableViewHeight + BottomMargin
     
     let neededHeight = InputFieldHeight + (searchResults.count * TableCellHeight) + BottomMargin
     
-    let height = (neededHeight < maxHeight) ? neededHeight : maxHeight
+    height = CGFloat((neededHeight < maxHeight) ? neededHeight : maxHeight)
     
-    let size = NSMakeSize(CGFloat(WindowWidth), CGFloat(height))
-    window?.setContentSize(size)
+    window?.setContentSize(NSMakeSize(width, height))
   }
   
   func focusInput() {
