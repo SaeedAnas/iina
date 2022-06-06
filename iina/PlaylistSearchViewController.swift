@@ -62,6 +62,10 @@ class PlaylistSearchViewController: NSWindowController {
   // Make the searching cancellable so we aren't searching for a pattern when the pattern has changed
   var searchWorkItem: DispatchWorkItem? = nil
   
+  // Wait for a set amount of time before searching
+  let waitSeconds = 0.15
+  var waitWorkItem: DispatchWorkItem? = nil
+  
   // Make updating the ui cancellable so we aren't rendering old search results
   var updateTableWorkItem: DispatchWorkItem? = nil
   
@@ -603,7 +607,11 @@ class PlaylistSearchViewController: NSWindowController {
 // MARK: Input Text Field Delegate
 extension PlaylistSearchViewController: NSTextFieldDelegate, NSControlTextEditingDelegate {
   func controlTextDidChange(_ obj: Notification) {
-    search(input: inputField.stringValue)
+    waitWorkItem?.cancel()
+    waitWorkItem = DispatchWorkItem {
+      self.search(input: self.inputField.stringValue)
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + waitSeconds, execute: waitWorkItem!)
   }
   
   func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
