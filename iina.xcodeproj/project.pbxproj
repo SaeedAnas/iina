@@ -155,6 +155,8 @@
 		84FBF23E1EF06A90003EA491 /* ThumbnailCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FBF23D1EF06A90003EA491 /* ThumbnailCache.swift */; };
 		8F49C36E213EFB7E0076C4F9 /* MiniPlayerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8F49C370213EFB7E0076C4F9 /* MiniPlayerWindowController.xib */; };
 		9E47DAC01E3CFA6D00457420 /* DurationDisplayTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E47DABF1E3CFA6D00457420 /* DurationDisplayTextField.swift */; };
+		A88EAD3B28F25BB000A1C0C0 /* PlaylistSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EAD3A28F25BB000A1C0C0 /* PlaylistSearchViewController.swift */; };
+		A88EAD3E28F25CF800A1C0C0 /* PlaylistSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A88EAD4028F25CF800A1C0C0 /* PlaylistSearchViewController.xib */; };
 		B4E446E825CB53920069F06E /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = B4E446E725CB53920069F06E /* PromiseKit */; };
 		B4E446F225CB53FF0069F06E /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = B4E446F125CB53FF0069F06E /* Gzip */; };
 		B4E446F725CB54EF0069F06E /* Mustache in Frameworks */ = {isa = PBXBuildFile; productRef = B4E446F625CB54EF0069F06E /* Mustache */; };
@@ -1411,6 +1413,8 @@
 		9DB9ED5C20889D66006B1492 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SubChooseViewController.strings; sourceTree = "<group>"; };
 		9E47DABF1E3CFA6D00457420 /* DurationDisplayTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DurationDisplayTextField.swift; sourceTree = "<group>"; };
 		9E63CAB61E3F7D0E00EA66C9 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		A88EAD3A28F25BB000A1C0C0 /* PlaylistSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSearchViewController.swift; sourceTree = "<group>"; };
+		A88EAD3F28F25CF800A1C0C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PlaylistSearchViewController.xib; sourceTree = "<group>"; };
 		B305513A2190B0C600D3F70E /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/MiniPlayerWindowController.strings; sourceTree = "<group>"; };
 		B3066F5F1F161538004D7559 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/InitialWindowController.strings; sourceTree = "<group>"; };
 		B35E0A072107C0E500453AA7 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PrefUtilsViewController.strings; sourceTree = "<group>"; };
@@ -2022,6 +2026,8 @@
 				8400D5CB1E1AB2F9006785F5 /* QuickSettingViewController.xib */,
 				8460FBA71D6497490081841B /* PlaylistViewController.swift */,
 				8400D5CE1E1AB2FF006785F5 /* PlaylistViewController.xib */,
+				A88EAD3A28F25BB000A1C0C0 /* PlaylistSearchViewController.swift */,
+				A88EAD4028F25CF800A1C0C0 /* PlaylistSearchViewController.xib */,
 				845FB0C61D39462E00C011E0 /* ControlBarView.swift */,
 				8450403B1E0A9EE20079C194 /* InspectorWindowController.swift */,
 				8400D5D41E1AB312006785F5 /* InspectorWindowController.xib */,
@@ -2705,6 +2711,7 @@
 				8400D5D21E1AB312006785F5 /* InspectorWindowController.xib in Resources */,
 				8400D5CC1E1AB2FF006785F5 /* PlaylistViewController.xib in Resources */,
 				8400D5ED1E1AB33F006785F5 /* PrefAdvancedViewController.xib in Resources */,
+				A88EAD3E28F25CF800A1C0C0 /* PlaylistSearchViewController.xib in Resources */,
 				8400D5CF1E1AB306006785F5 /* CropSettingsViewController.xib in Resources */,
 				6100FF2B1EDF9806002CF0FB /* dsa_pub.pem in Resources */,
 				849581F31F03D55A00D3B359 /* InitialWindowController.xib in Resources */,
@@ -2844,6 +2851,7 @@
 				E38BA1C0253E54F2000B551D /* JavascriptAPIGlobal.swift in Sources */,
 				E39A11FD240F176E00A67F9F /* StringEncodingName.swift in Sources */,
 				E33FEEB52229A44F00B59711 /* JavascriptAPIUtils.swift in Sources */,
+				A88EAD3B28F25BB000A1C0C0 /* PlaylistSearchViewController.swift in Sources */,
 				84C6D3671EB2A427009BF721 /* HistoryWindowController.swift in Sources */,
 				9E47DAC01E3CFA6D00457420 /* DurationDisplayTextField.swift in Sources */,
 				E35306F62147F7AF008FE492 /* JavascriptAPIMpv.swift in Sources */,
@@ -3941,6 +3949,14 @@
 				348B000028DC688D0045F683 /* sr-Latn */,
 			);
 			name = MiniPlayerWindowController.xib;
+			sourceTree = "<group>";
+		};
+		A88EAD4028F25CF800A1C0C0 /* PlaylistSearchViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A88EAD3F28F25CF800A1C0C0 /* Base */,
+			);
+			name = PlaylistSearchViewController.xib;
 			sourceTree = "<group>";
 		};
 		C78987311E34EF170005769F /* InfoPlist.strings */ = {

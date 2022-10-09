@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="PlaylistSearchViewController" customModule="IINA" customModuleProvider="target">
+            <connections>
+                <outlet property="clearBtn" destination="yEh-yZ-Vg0" id="Uqt-Xn-AyU"/>
+                <outlet property="inputField" destination="aXt-At-Xpm" id="06W-hG-H1E"/>
+                <outlet property="searchPopUp" destination="vrW-6I-fbG" id="Qsz-xM-fvx"/>
+                <outlet property="view" destination="d9f-bE-Ub6" id="9FF-GU-dSv"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="d9f-bE-Ub6" userLabel="SearchBar">
+            <rect key="frame" x="0.0" y="0.0" width="236" height="30"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="vrW-6I-fbG">
+                    <rect key="frame" x="3" y="8" width="35" height="14"/>
+                    <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" pullsDown="YES" altersStateOfSelectedItem="NO" selectedItem="9CU-0u-KXW" id="dwU-sX-bdA">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" size="12" name="HelveticaNeue"/>
+                        <menu key="menu" id="Pab-48-JJx">
+                            <items>
+                                <menuItem state="on" image="magnifyingglass" catalog="system" hidden="YES" id="9CU-0u-KXW"/>
+                                <menuItem title="Item 2" id="PCA-Hv-23B"/>
+                                <menuItem title="Item 3" id="5RW-H0-7Pg"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                </popUpButton>
+                <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yEh-yZ-Vg0">
+                    <rect key="frame" x="214" y="8" width="14" height="13.5"/>
+                    <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="xmark.circle.fill" catalog="system" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="keK-Va-z9s">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="cellTitle"/>
+                    </buttonCell>
+                </button>
+                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aXt-At-Xpm">
+                    <rect key="frame" x="44" y="7" width="164" height="16"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Search" usesSingleLineMode="YES" id="exG-iv-Vja">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="yEh-yZ-Vg0" firstAttribute="centerY" secondItem="d9f-bE-Ub6" secondAttribute="centerY" id="Cx3-d4-fam"/>
+                <constraint firstItem="vrW-6I-fbG" firstAttribute="leading" secondItem="d9f-bE-Ub6" secondAttribute="leading" constant="8" id="Pj3-7G-JN5"/>
+                <constraint firstItem="aXt-At-Xpm" firstAttribute="leading" secondItem="vrW-6I-fbG" secondAttribute="trailing" constant="8" id="VNO-6w-Q3A"/>
+                <constraint firstItem="yEh-yZ-Vg0" firstAttribute="leading" secondItem="aXt-At-Xpm" secondAttribute="trailing" constant="8" id="hhB-03-fhk"/>
+                <constraint firstAttribute="trailing" secondItem="yEh-yZ-Vg0" secondAttribute="trailing" constant="8" id="iF3-6Y-q7b"/>
+                <constraint firstAttribute="height" constant="30" id="iaU-Gh-AUu"/>
+                <constraint firstItem="aXt-At-Xpm" firstAttribute="centerY" secondItem="d9f-bE-Ub6" secondAttribute="centerY" id="rJI-Cf-XZW"/>
+                <constraint firstItem="vrW-6I-fbG" firstAttribute="centerY" secondItem="d9f-bE-Ub6" secondAttribute="centerY" id="u6g-fY-rpJ"/>
+            </constraints>
+            <point key="canvasLocation" x="60" y="94"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="magnifyingglass" catalog="system" width="16" height="15"/>
+        <image name="xmark.circle.fill" catalog="system" width="15" height="15"/>
+    </resources>
+</document>

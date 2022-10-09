@@ -74,6 +74,15 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
   @IBOutlet weak var addBtn: NSButton!
   @IBOutlet weak var removeBtn: NSButton!
   
+  // Placeholder Frame for Search Bar
+  @IBOutlet weak var searchBarFrame: NSView!
+  lazy var playlistSearchViewController: PlaylistSearchViewController! = {
+    let playlistSearchViewController = PlaylistSearchViewController()
+    playlistSearchViewController.playlistViewController = self
+    return playlistSearchViewController
+  }()
+  
+  
   private var playlistTotalLengthIsReady = false
   private var playlistTotalLength: Double? = nil
 
@@ -100,6 +109,9 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
       $0?.image?.isTemplate = true
       $0?.alternateImage?.isTemplate = true
     }
+    
+    // Add SearchBar to Search Bar Frame
+    searchBarFrame.addSubview(playlistSearchViewController.view)
     
     deleteBtn.toolTip = NSLocalizedString("mini_player.delete", comment: "delete")
     loopBtn.toolTip = NSLocalizedString("mini_player.loop", comment: "loop")
